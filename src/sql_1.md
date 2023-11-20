@@ -60,3 +60,19 @@ SELECT 1;
    1. We call other API `ResultSetToStringSlice` from session to fetch the result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/session/tidb.go#L367>
    2. It will call `GetRows4Test` to get the result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/session/tidb.go>
    3. In `GetRows4Test`, we need to allocate a `chunk` to store the result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/session/tidb.go#L347>
+      1. We call the `Next` method of the `RecordSet` to get the result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/executor/adapter.go#L144>
+      2. We call the `Next` method of the real executor to get the result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/executor/internal/exec/executor.go#L261>
+      3. Because our executor is a simple `ProjectionExec`, we do an `unParallelExecute` here: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/executor/projection.go>
+      4. We call the `Next` method of the child executor to get the result, because it is a `TableDualExec`, so we do nothing: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/executor/executor.go>
+      5. Finally, we can evaluate the expression and get the result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/executor/projection.go#L207>
+         1. We use the default evaluator to evaluate the expression: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/evaluator.go>
+         2. It tries to create an iterator from the input: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/evaluator.go>
+         3. We call `evalOneVec` to evaluate the expression: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/evaluator.go>
+         4. Because our expression is an `Int` expression, we call `VecEvalInt` to evaluate it: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/chunk_executor.go>
+         5. Then we use `genVecFromConstExpr` to generate the result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/vectorized.go#L24>
+            1. We call `EvalInt` to evaluate the expression: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/vectorized.go>
+            2. Because our expression is a `Constant` expression, we call `EvalInt` to evaluate it: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/constant.go#L270>
+            3. Set value to the `Datum`: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/constant.go>
+            4. Return the final result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/expression/constant.go>
+   4. Create a iterator to iterate the result: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/session/tidb.go>
+   5. Convert the result to string: <https://github.com/hi-rustin/tidb/blob/tidb-101/pkg/session/tidb.go>
