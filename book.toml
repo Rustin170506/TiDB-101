@@ -1,6 +1,0 @@
-[book]
-authors = ["hi-rustin"]
-language = "en"
-multilingual = false
-src = "src"
-title = "TiDB-101"
