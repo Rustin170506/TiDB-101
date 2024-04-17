@@ -1,6 +1,6 @@
 ---
 theme: seriph
-background: https://cover.sli.dev
+background: https://static.pingcap.com/files/2023/06/01173743/illus-scalable-1.svg
 title: TiDB 101
 info: |
   ## TiDB 101
@@ -32,3 +32,28 @@ mdc: true
     <carbon-logo-github />
   </a>
 </div>
+
+---
+transition: slide-up
+---
+
+# SQL 1
+
+
+```sql
+mysql> SELECT 1;
++---+
+| 1 |
++---+
+| 1 |
++---+
+1 row in set (0.00 sec)
+
+mysql> SELECT 1 FROM DUAL;
++---+
+| 1 |
++---+
+| 1 |
++---+
+1 row in set (0.00 sec)
+```
