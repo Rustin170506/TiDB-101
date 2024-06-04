@@ -1,5 +1,5 @@
 ---
-theme: seriph
+theme: default
 background: https://static.pingcap.com/files/2023/06/01173743/illus-scalable-1.svg
 title: TiDB 101
 info: |
@@ -56,4 +56,42 @@ mysql> SELECT 1 FROM DUAL;
 | 1 |
 +---+
 1 row in set (0.00 sec)
+```
+
+---
+transition: slide-up
+---
+
+# Hash Join
+Create two tables and insert data:
+
+```sql
+create table t1 (a int, b int, key(a));
+create table t2 (a int, b int, key(a));
+insert into t1 values (1, 1), (2, 2), (3, 3);
+insert into t2 values (1, 1), (2, 2), (3, 3);
+analyze table t1, t2;
+```
+
+---
+transition: slide-up
+---
+
+# Hash Join
+Check query plan:
+
+```sql
+mysql> explain select * from t1, t2 where t1.a = t2.a;
++------------------------------+---------+-----------+---------------+----------------------------------------------+
+| id                           | estRows | task      | access object | operator info                                |
++------------------------------+---------+-----------+---------------+----------------------------------------------+
+| HashJoin_37                  | 3.00    | root      |               | inner join, equal:[eq(test.t1.a, test.t2.a)] |
+| ├─TableReader_55(Build)      | 3.00    | root      |               | data:Selection_54                            |
+| │ └─Selection_54             | 3.00    | cop[tikv] |               | not(isnull(test.t2.a))                       |
+| │   └─TableFullScan_53       | 3.00    | cop[tikv] | table:t2      | keep order:false                             |
+| └─TableReader_49(Probe)      | 3.00    | root      |               | data:Selection_48                            |
+|   └─Selection_48             | 3.00    | cop[tikv] |               | not(isnull(test.t1.a))                       |
+|     └─TableFullScan_47       | 3.00    | cop[tikv] | table:t1      | keep order:false                             |
++------------------------------+---------+-----------+---------------+----------------------------------------------+
+7 rows in set (0.00 sec)
 ```
