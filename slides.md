@@ -1,6 +1,5 @@
 ---
 theme: default
-background: https://static.pingcap.com/files/2023/06/01173743/illus-scalable-1.svg
 title: TiDB 101
 info: |
   ## TiDB 101
@@ -37,31 +36,6 @@ mdc: true
 transition: slide-up
 ---
 
-# SQL 1
-
-
-```sql
-mysql> SELECT 1;
-+---+
-| 1 |
-+---+
-| 1 |
-+---+
-1 row in set (0.00 sec)
-
-mysql> SELECT 1 FROM DUAL;
-+---+
-| 1 |
-+---+
-| 1 |
-+---+
-1 row in set (0.00 sec)
-```
-
----
-transition: slide-up
----
-
 # Hash Join
 Create two tables and insert data:
 
@@ -81,7 +55,7 @@ transition: slide-up
 Check query plan:
 
 ```sql
-mysql> explain select * from t1, t2 where t1.a = t2.a;
+mysql> explain select * from t1 inner join t2 on t1.a = t2.a
 +------------------------------+---------+-----------+---------------+----------------------------------------------+
 | id                           | estRows | task      | access object | operator info                                |
 +------------------------------+---------+-----------+---------------+----------------------------------------------+
